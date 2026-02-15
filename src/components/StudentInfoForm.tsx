@@ -139,7 +139,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({ examInfo, onSubmit })
                 <div>
                     <input
                         type="number"
-                        value={score}
+                        value={score === 0 ? '' : score}
                         onChange={(e) => setScore(Number(e.target.value))}
                         className="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         placeholder="0-100"
@@ -171,7 +171,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({ examInfo, onSubmit })
                                 <label className="block text-slate-400 mb-1">번호</label>
                                 <input
                                     type="number"
-                                    value={q.questionNumber}
+                                    value={q.questionNumber === 0 ? '' : q.questionNumber}
                                     onChange={(e) => updateQuestion(q.id, 'questionNumber', Number(e.target.value))}
                                     className="w-full p-1 border rounded"
                                 />
@@ -180,7 +180,7 @@ const StudentInfoForm: React.FC<StudentInfoFormProps> = ({ examInfo, onSubmit })
                                 <label className="block text-slate-400 mb-1">정답률</label>
                                 <input
                                     type="number"
-                                    value={q.correctRate}
+                                    value={q.correctRate === 0 ? '' : q.correctRate}
                                     onChange={(e) => updateQuestion(q.id, 'correctRate', Number(e.target.value))}
                                     className="w-full p-1 border rounded"
                                 />

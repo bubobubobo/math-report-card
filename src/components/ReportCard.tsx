@@ -24,14 +24,14 @@ const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
             {/* Header */}
             <header className="border-b-2 border-slate-800 pb-4 mb-8 flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">수학 학습 분석표</h1>
-                    <p className="text-slate-500 mt-1">Mathematics Performance Report</p>
+                    <h1 className="text-3xl font-extrabold text-slate-900 mb-2">{data.examInfo.examName} 결과 리포트</h1>
+                    <p className="text-slate-500 text-sm">
+                        {data.examInfo.round}회차 | {data.examInfo.startDate} ~ {data.examInfo.endDate}
+                    </p>
                 </div>
                 <div className="text-right">
-                    <div className="text-2xl font-bold text-indigo-700">{data.score}점</div>
-                    <div className="text-sm text-slate-600">
-                        {data.studentName} | {data.examDate}
-                    </div>
+                    <p className="text-lg font-bold text-slate-800">{data.studentName} 학생</p>
+                    <p className="text-indigo-600 font-bold text-2xl">{data.score}점</p>
                 </div>
             </header>
 

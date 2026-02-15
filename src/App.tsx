@@ -3,6 +3,7 @@ import * as htmlToImage from 'html-to-image';
 import ExamInfoForm from './components/ExamInfoForm';
 import StudentInfoForm from './components/StudentInfoForm';
 import ReportCard from './components/ReportCard';
+import { Download, Trash2 } from 'lucide-react';
 import type { ReportData, ExamInfo } from './types';
 
 function App() {
@@ -13,6 +14,12 @@ function App() {
 
   const addReportCallback = (data: ReportData) => {
     setProcessingReport(data);
+  };
+
+  const deleteReport = (index: number) => {
+    if (confirm('정말로 이 성적표를 삭제하시겠습니까?')) {
+      setReports(reports.filter((_, i) => i !== index));
+    }
   };
 
   useEffect(() => {
@@ -74,15 +81,25 @@ function App() {
                       }
                     }}
                   />
-                  <div className="p-2 bg-slate-50 border-t flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-700 truncate">{report.data.studentName}</span>
-                    <a
-                      href={report.imageUrl}
-                      download={`${report.data.studentName}_성적표.png`}
-                      className="text-blue-600 hover:text-blue-800 font-semibold"
-                    >
-                      다운로드
-                    </a>
+                  <div className="p-3 bg-slate-50 border-t flex justify-between items-center">
+                    <span className="font-bold text-slate-700 truncate text-sm">{report.data.studentName}</span>
+                    <div className="flex gap-2">
+                      <a
+                        href={report.imageUrl}
+                        download={`${report.data.studentName}_성적표.png`}
+                        className="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition"
+                        title="다운로드"
+                      >
+                        <Download size={16} />
+                      </a>
+                      <button
+                        onClick={() => deleteReport(index)}
+                        className="p-1.5 text-red-500 hover:bg-red-100 rounded transition"
+                        title="삭제"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

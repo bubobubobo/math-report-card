@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { ExamInfo, ScoreInfo } from '../types';
 import { Check, Edit2 } from 'lucide-react';
 
@@ -107,7 +107,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
                         <label className="block text-sm font-medium text-slate-700 mb-1">회차</label>
                         <input
                             type="number"
-                            value={round}
+                            value={round === 0 ? '' : round}
                             onChange={(e) => setRound(Number(e.target.value))}
                             className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             placeholder="1"
@@ -117,7 +117,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
                         <label className="block text-sm font-medium text-slate-700 mb-1">응시 인원</label>
                         <input
                             type="number"
-                            value={totalStudents}
+                            value={totalStudents === 0 ? '' : totalStudents}
                             onChange={(e) => setTotalStudents(Number(e.target.value))}
                             className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             placeholder="명"
@@ -145,7 +145,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
                         <label className="block text-sm font-medium text-slate-700 mb-1">전체 문항 수</label>
                         <input
                             type="number"
-                            value={totalQuestions}
+                            value={totalQuestions === 0 ? '' : totalQuestions}
                             onChange={(e) => handleTotalQuestionsChange(Number(e.target.value))}
                             className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             placeholder="예: 20"
@@ -162,7 +162,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
                                     <span className="text-[10px] text-slate-500">{s.questionNumber}</span>
                                     <input
                                         type="number"
-                                        value={s.score}
+                                        value={s.score === 0 ? '' : s.score}
                                         onChange={(e) => updateScoreInfo(s.questionNumber, Number(e.target.value))}
                                         className="w-full text-center text-xs p-1 border border-slate-200 rounded focus:outline-none focus:border-blue-500"
                                     />
