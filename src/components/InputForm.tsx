@@ -22,12 +22,12 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
     const addQuestion = () => {
         const newQuestion: WrongQuestion = {
             id: crypto.randomUUID(),
-            questionNumber: wrongQuestions.length + 1,
+            questionNumber: '',
             subject: Object.keys(MATH_METADATA.subjects)[0] || '',
             majorChapter: 0,
             minorChapter: 0,
             questionType: 0,
-            correctRate: 0,
+            correctRate: '',
         };
         setWrongQuestions([...wrongQuestions, newQuestion]);
     };
@@ -45,9 +45,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const handleGenerateReport = () => {
         if (!studentName || score === '') {
             alert('학생 이름과 점수를 입력해주세요.');
             return;
@@ -101,7 +99,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-6 text-slate-800">성적 입력</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
 
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -129,7 +127,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
                         <input
                             type="number"
                             value={score}
-                            onChange={(e) => setScore(Number(e.target.value))}
+                            onChange={(e) => setScore(e.target.value === '' ? '' : Number(e.target.value))}
                             className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             placeholder="0-100"
                         />
@@ -166,7 +164,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
                                     <input
                                         type="number"
                                         value={q.questionNumber}
-                                        onChange={(e) => updateQuestion(q.id, 'questionNumber', Number(e.target.value))}
+                                        onChange={(e) => updateQuestion(q.id, 'questionNumber', e.target.value === '' ? '' : Number(e.target.value))}
                                         className="w-full p-2 border border-slate-300 rounded text-sm"
                                     />
                                 </div>
@@ -225,7 +223,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
                                     <input
                                         type="number"
                                         value={q.correctRate}
-                                        onChange={(e) => updateQuestion(q.id, 'correctRate', Number(e.target.value))}
+                                        onChange={(e) => updateQuestion(q.id, 'correctRate', e.target.value === '' ? '' : Number(e.target.value))}
                                         className="w-full p-2 border border-slate-300 rounded text-sm"
                                     />
                                 </div>
@@ -261,7 +259,8 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit }) => {
 
                 <div className="pt-4">
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handleGenerateReport}
                         className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition shadow-lg"
                     >
                         성적표 생성하기

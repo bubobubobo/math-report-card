@@ -1,11 +1,11 @@
 export interface WrongQuestion {
     id: string; // Unique ID for list rendering
-    questionNumber: number;
+    questionNumber: number | '';
     subject: string;
     majorChapter: number;
     minorChapter: number;
     questionType: number;
-    correctRate: number;
+    correctRate: number | '';
 }
 
 export interface Comment {
