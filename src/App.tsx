@@ -1,27 +1,104 @@
-import { useState } from 'react';
-import InputForm from './components/InputForm';
+import { useState, useEffect, useRef } from 'react';
+import * as htmlToImage from 'html-to-image';
+import ExamInfoForm from './components/ExamInfoForm';
+import StudentInfoForm from './components/StudentInfoForm';
 import ReportCard from './components/ReportCard';
-import type { ReportData } from './types';
+import type { ReportData, ExamInfo } from './types';
 
 function App() {
-  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [examInfo, setExamInfo] = useState<ExamInfo | null>(null);
+  const [reports, setReports] = useState<{ data: ReportData, imageUrl: string }[]>([]);
+  const [processingReport, setProcessingReport] = useState<ReportData | null>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
-  const handleFormSubmit = (data: ReportData) => {
-    setReportData(data);
+  const addReportCallback = (data: ReportData) => {
+    setProcessingReport(data);
   };
 
-  const handleReset = () => {
-    if (confirm('작성 중인 내용이 초기화됩니다. 계속하시겠습니까?')) {
-      setReportData(null);
+  useEffect(() => {
+    if (processingReport && captureRef.current) {
+      // Wait for render to stabilize (fonts, layout)
+      const timer = setTimeout(() => {
+        if (captureRef.current) {
+          htmlToImage.toPng(captureRef.current, {
+            cacheBust: true,
+            backgroundColor: '#ffffff' // Ensure white background
+          })
+            .then((dataUrl) => {
+              setReports((prev) => [...prev, { data: processingReport, imageUrl: dataUrl }]);
+              setProcessingReport(null);
+            })
+            .catch((err) => {
+              console.error("Failed to capture report image:", err);
+              alert("이미지 생성 중 오류가 발생했습니다. (html-to-image)");
+              setProcessingReport(null);
+            });
+        }
+      }, 800);
+
+      return () => clearTimeout(timer);
     }
-  };
+  }, [processingReport]);
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:p-0">
-      {reportData ? (
-        <ReportCard data={reportData} onReset={handleReset} />
-      ) : (
-        <InputForm onSubmit={handleFormSubmit} />
+    <div className="min-h-screen bg-slate-100 p-8 font-sans print:bg-white print:p-0">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-12 gap-8 print:hidden">
+
+        {/* Left Column: Input Forms */}
+        <div className="col-span-12 lg:col-span-4 space-y-8">
+          <ExamInfoForm onSave={setExamInfo} />
+          <StudentInfoForm examInfo={examInfo} onSubmit={addReportCallback} />
+        </div>
+
+        {/* Right Column: Report Previews */}
+        <div className="col-span-12 lg:col-span-8 space-y-8">
+          <h2 className="text-2xl font-bold text-slate-800">생성된 성적표 ({reports.length})</h2>
+          {reports.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[600px] bg-white rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
+              <p className="text-lg">성적표 이미지 생성 중...</p>
+              <p className="text-sm">좌측에서 정보를 입력하고 성적표를 생성해보세요.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Changed to grid-cols-2/3 for smaller images (thumbnails) */}
+              {reports.map((report, index) => (
+                <div key={index} className="bg-white rounded shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition">
+                  <img
+                    src={report.imageUrl}
+                    alt={`${report.data.studentName} 성적표`}
+                    className="w-full h-auto object-contain cursor-pointer"
+                    onClick={() => {
+                      const win = window.open();
+                      if (win) {
+                        win.document.write(`<img src="${report.imageUrl}" style="width:100%"/>`);
+                      }
+                    }}
+                  />
+                  <div className="p-2 bg-slate-50 border-t flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700 truncate">{report.data.studentName}</span>
+                    <a
+                      href={report.imageUrl}
+                      download={`${report.data.studentName}_성적표.png`}
+                      className="text-blue-600 hover:text-blue-800 font-semibold"
+                    >
+                      다운로드
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hidden Capture Area */}
+      {processingReport && (
+        <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -50, opacity: 0, pointerEvents: 'none' }}>
+          <div ref={captureRef} className="w-[800px] min-h-[1000px] bg-white p-8 box-border">
+            {/* Fixed width and min-height for consistent capture size */}
+            <ReportCard data={processingReport} onReset={() => { }} />
+          </div>
+        </div>
       )}
     </div>
   );

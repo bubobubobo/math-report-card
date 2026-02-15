@@ -1,14 +1,12 @@
 import React from 'react';
 import type { ReportData } from '../types';
 import { MATH_METADATA } from '../data/metadata';
-import { Printer, RefreshCw } from 'lucide-react';
 
 interface ReportCardProps {
     data: ReportData;
-    onReset: () => void;
 }
 
-const ReportCard: React.FC<ReportCardProps> = ({ data, onReset }) => {
+const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
     const getMajorName = (subject: string, id: number) => {
         return MATH_METADATA.subjects[subject]?.majorChapters[id]?.name || '-';
     };
@@ -19,10 +17,6 @@ const ReportCard: React.FC<ReportCardProps> = ({ data, onReset }) => {
 
     const getTypeName = (subject: string, majorId: number, minorId: number, typeId: number) => {
         return MATH_METADATA.subjects[subject]?.majorChapters[majorId]?.minorChapters[minorId]?.questionTypes[typeId] || '-';
-    };
-
-    const handlePrint = () => {
-        window.print();
     };
 
     return (
@@ -102,22 +96,6 @@ const ReportCard: React.FC<ReportCardProps> = ({ data, onReset }) => {
                     </div>
                 ))}
             </section>
-
-            {/* Footer / Actions */}
-            <div className="mt-12 pt-6 border-t border-slate-200 flex justify-between print:hidden">
-                <button
-                    onClick={onReset}
-                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition"
-                >
-                    <RefreshCw size={18} /> 새 성적표 작성
-                </button>
-                <button
-                    onClick={handlePrint}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition"
-                >
-                    <Printer size={18} /> 인쇄 / PDF 저장
-                </button>
-            </div>
         </div>
     );
 };
