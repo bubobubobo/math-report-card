@@ -14,12 +14,29 @@ export interface Comment {
     content: string;
 }
 
+// Exam Information Types
+export interface ScoreInfo {
+    questionNumber: number;
+    score: number;
+}
+
+export interface ExamInfo {
+    examName: string;
+    startDate: string;
+    endDate: string;
+    totalStudents: number;
+    round: number;
+    totalQuestions: number;
+    scoreDistribution: ScoreInfo[];
+}
+
 export interface ReportData {
     studentName: string;
-    examDate: string;
+    examDate: string; // Keep for now or replace with linked ExamInfo?
     score: number;
     wrongQuestions: WrongQuestion[];
     comments: Comment[];
+    examInfo?: ExamInfo; // Optional for now
 }
 
 // Metadata Types
