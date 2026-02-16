@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import ExamInfoForm from './components/ExamInfoForm';
 import PromptDisplay from './components/PromptDisplay';
 import JsonUpload from './components/JsonUpload';
 import ReportCard from './components/ReportCard';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, FolderDown } from 'lucide-react';
 import type { ReportData, ExamInfo, StudentAnalysis } from './types';
 
 function App() {
@@ -52,9 +54,27 @@ function App() {
     });
   };
 
-  const deleteReport = (index: number) => {
-    if (confirm('정말로 이 성적표를 삭제하시겠습니까?')) {
-      setReports(reports.filter((_, i) => i !== index));
+  const handleDownloadAll = async () => {
+    if (reports.length === 0) return;
+
+    const zip = new JSZip();
+    const folderName = examInfo ? `${examInfo.examName}_성적표` : '성적표_모음';
+    const folder = zip.folder(folderName);
+
+    if (!folder) return;
+
+    reports.forEach((report) => {
+      // Remove data:image/png;base64, prefix
+      const base64Data = report.imageUrl.split(',')[1];
+      folder.file(`${report.data.studentName}_성적표.png`, base64Data, { base64: true });
+    });
+
+    try {
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, `${folderName}.zip`);
+    } catch (err) {
+      console.error('Failed to generate zip:', err);
+      alert('ZIP 파일 생성 중 오류가 발생했습니다.');
     }
   };
 
@@ -106,12 +126,36 @@ function App() {
           </button>
         </div>
 
-        {/* Right Column: Report Previews */}
         <div className="col-span-12 lg:col-span-8 space-y-8">
-          <h2 className="text-2xl font-bold text-slate-800">생성된 성적표 ({reports.length})</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-slate-800">생성된 성적표 ({reports.length})</h2>
+            <button
+              onClick={handleDownloadAll}
+              disabled={reports.length === 0 || isGenerating}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition shadow-sm font-medium ${reports.length === 0 || isGenerating
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+            >
+              <FolderDown size={20} />
+              {isGenerating ? '생성 완료 대기중...' : '전체 다운로드 (ZIP)'}
+            </button>
+          </div>
           {reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[600px] bg-white rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
-              <p className="text-sm">좌측에서 정보를 입력하고 성적표를 생성해보세요.</p>
+              <p className="text-sm">좌측에서 학생 정보를 입력하고 성적표를 생성해보세요.</p>
+              <div className="mt-4" />
+              <h3>1. 시험 정보 입력</h3>
+              <div className="mt-2" />
+              <p className="text-sm">시험 이름, 시험 날짜, 시험 시간, 시험 종류를 입력하고 입력 완료 버튼을 눌러 저장해주세요.</p>
+              <div className="mt-4" />
+              <h3>2. ai 프롬프트로 JSON파일 생성</h3>
+              <div className="mt-2" />
+              <p className="text-sm">프롬프트 텍스트를 복사하여 ai 프롬프트에 입력하고 엑셀 파일을 함께 업로드해 JSON파일을 생성해주세요. Claude ai 사용을 권장합니다.</p>
+              <div className="mt-4" />
+              <h3>3. JSON결과 업로드</h3>
+              <div className="mt-2" />
+              <p className="text-sm">생성된 JSON파일을 업로드하여 성적표를 생성해주세요.</p>
             </div>
           ) : (
             <div className="space-y-4">
