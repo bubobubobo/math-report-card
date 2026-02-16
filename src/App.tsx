@@ -11,16 +11,30 @@ function App() {
   const [examInfo, setExamInfo] = useState<ExamInfo | null>(null);
   const [reports, setReports] = useState<{ data: ReportData, imageUrl: string }[]>([]);
   const [processingReport, setProcessingReport] = useState<ReportData | null>(null);
+  const [uploadedStudents, setUploadedStudents] = useState<StudentAnalysis[] | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const captureRef = useRef<HTMLDivElement>(null);
 
-  const handleBatchGenerate = (students: StudentAnalysis[]) => {
+  const handleJsonUpload = (students: StudentAnalysis[]) => {
+    setUploadedStudents(students);
+  };
+
+  const handleGenerateReports = () => {
     if (!examInfo) {
       alert('시험 정보가 설정되지 않았습니다.');
       return;
     }
 
+    if (!uploadedStudents || uploadedStudents.length === 0) {
+      alert('업로드된 학생 데이터가 없습니다.');
+      return;
+    }
+
+    setIsGenerating(true);
+    setReports([]); // Clear previous reports
+
     // Process students one by one with delay
-    students.forEach((student, index) => {
+    uploadedStudents.forEach((student, index) => {
       setTimeout(() => {
         const reportData: ReportData = {
           studentName: student.studentInfo.이름,
@@ -28,6 +42,11 @@ function App() {
           studentAnalysis: student
         };
         setProcessingReport(reportData);
+
+        // Turn off generating state after last student
+        if (index === uploadedStudents.length - 1) {
+          setTimeout(() => setIsGenerating(false), 1000);
+        }
       }, index * 1000); // 1 second delay between each
     });
   };
@@ -71,7 +90,19 @@ function App() {
         <div className="col-span-12 lg:col-span-4 space-y-8">
           <ExamInfoForm onSave={setExamInfo} />
           <PromptDisplay />
-          <JsonUpload onJsonLoaded={handleBatchGenerate} />
+          <JsonUpload onJsonLoaded={handleJsonUpload} />
+
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerateReports}
+            disabled={!examInfo || !uploadedStudents || isGenerating}
+            className={`w-full py-4 px-6 rounded-lg font-bold text-lg transition-all ${examInfo && uploadedStudents && !isGenerating
+              ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+              : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+              }`}
+          >
+            {isGenerating ? '생성 중...' : `성적표 생성 ${uploadedStudents ? `(${uploadedStudents.length}명)` : ''}`}
+          </button>
         </div>
 
         {/* Right Column: Report Previews */}
@@ -131,6 +162,24 @@ function App() {
           <div ref={captureRef} className="w-[800px] min-h-[1000px] bg-white p-8 box-border">
             {/* Fixed width and min-height for consistent capture size */}
             <ReportCard data={processingReport} />
+          </div>
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 transition-opacity">
+          <div className="bg-white rounded-xl p-8 flex flex-col items-center gap-6 shadow-2xl min-w-[300px] animate-in fade-in zoom-in duration-200">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-slate-200 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-slate-800 mb-2">성적표 생성 중...</p>
+              <p className="text-slate-600 font-medium">
+                {reports.length} / {uploadedStudents?.length || 0} 완료
+              </p>
+            </div>
           </div>
         </div>
       )}
