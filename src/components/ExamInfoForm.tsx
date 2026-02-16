@@ -71,7 +71,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-800 mb-4 pb-2 border-b">시험 정보 입력</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4 pb-2 border-b">1. 시험 정보 입력</h2>
             <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">시험 이름</label>

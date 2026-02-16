@@ -41,10 +41,10 @@ const PromptDisplay: React.FC<PromptDisplayProps> = ({ className = '' }) => {
         <div className={`bg-white rounded-lg shadow-md border border-slate-200 ${className}`}>
             <div className="relative">
                 {/* Header with Copy Button */}
-                <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 bg-slate-50 rounded-t-lg">
+                <div className="flex justify-between gap-2 items-center px-4 py-3 border-b border-slate-200 bg-slate-50 rounded-t-lg">
                     <div className="flex flex-col">
-                        <h3 className="text-lg font-bold text-slate-800">예시 프롬프트 텍스트</h3>
-                        <p className="text-sm py-1 text-slate-600">이 텍스트를 복사해서 AI에게 전달해주세요. 결과로 나온 JSON파일을 아래에 업로드해주세요.</p>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">2. 예시 프롬프트 텍스트</h2>
+                        <p className="text-sm py-1 text-slate-600">이 텍스트를 복사해서 결과 엑셀과 함께 AI에게 전달해주세요. 결과로 나온 JSON파일을 아래에 업로드해주세요.</p>
                     </div>
                     <button
                         onClick={handleCopy}
