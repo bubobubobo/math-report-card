@@ -34,16 +34,36 @@ const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
             </header>
 
             {/* Student Info */}
-            <section className="mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <section className={`mb-6 p-4 rounded-lg border ${analysis.studentInfo.등수 <= 15
+                ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300 shadow-lg'
+                : 'bg-slate-50 border-slate-200'
+                }`}>
                 <h2 className="text-xl font-bold text-slate-800 mb-3">학생 정보</h2>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                     <div><span className="font-semibold text-slate-600">이름:</span> <span className="text-slate-900">{analysis.studentInfo.이름}</span></div>
                     <div><span className="font-semibold text-slate-600">학교:</span> <span className="text-slate-900">{analysis.studentInfo.학교}</span></div>
                     <div><span className="font-semibold text-slate-600">반:</span> <span className="text-slate-900">{analysis.studentInfo.반}</span></div>
-                    <div><span className="font-semibold text-slate-600">점수:</span> <span className="text-slate-900 font-bold">{analysis.studentInfo.점수}점</span></div>
-                    <div><span className="font-semibold text-slate-600">등수:</span> <span className="text-slate-900">{analysis.studentInfo.등수}등</span></div>
                     <div><span className="font-semibold text-slate-600">맞춘 개수:</span> <span className="text-slate-900">{analysis.studentInfo.맞춘개수}</span></div>
                 </div>
+
+                {/* Highlighted Score and Rank for Top 15 */}
+                {analysis.studentInfo.등수 <= 15 ? (
+                    <div className="mt-4 pt-4 border-t border-yellow-300 flex justify-around items-center">
+                        <div className="text-center">
+                            <p className="text-sm font-semibold text-amber-700 mb-1">점수</p>
+                            <p className="text-4xl font-extrabold text-amber-600">{analysis.studentInfo.점수}점</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-semibold text-amber-700 mb-1">등수</p>
+                            <p className="text-4xl font-extrabold text-amber-600">{analysis.studentInfo.등수}등</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                        <div><span className="font-semibold text-slate-600">점수:</span> <span className="text-slate-900 font-bold">{analysis.studentInfo.점수}점</span></div>
+                        <div><span className="font-semibold text-slate-600">등수:</span> <span className="text-slate-900">{analysis.studentInfo.등수}등</span></div>
+                    </div>
+                )}
             </section>
 
             {/* Wrong Questions Table */}
@@ -64,7 +84,9 @@ const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
                                 <tr key={idx} className="hover:bg-slate-50">
                                     <td className="border border-slate-300 px-3 py-2">{q.문항번호}</td>
                                     <td className="border border-slate-300 px-3 py-2">{q.단원}</td>
-                                    <td className="border border-slate-300 px-3 py-2">{q.출처}</td>
+                                    <td className="border border-slate-300 px-3 py-2">
+                                        {q.출처.includes('교재') ? q.출처.replace(/교재/g, '베이스캠프') : q.출처}
+                                    </td>
                                     <td className="border border-slate-300 px-3 py-2">{q.정답률}</td>
                                 </tr>
                             ))}

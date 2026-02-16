@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import type { ExamInfo, StudentAnalysis } from '../types';
+import type { ExamInfo } from '../types';
 import { Check, Edit2 } from 'lucide-react';
-import { loadStudentAnalysis } from '../utils/jsonLoader';
 
 interface ExamInfoFormProps {
     onSave: (info: ExamInfo) => void;
-    onBatchGenerate?: (students: StudentAnalysis[]) => void;
 }
 
-const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave, onBatchGenerate }) => {
+const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
     const [isLocked, setIsLocked] = useState(false);
 
     const [examName, setExamName] = useState('');
@@ -22,7 +20,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave, onBatchGenerate }) 
         setTotalQuestions(val);
     };
 
-    const handleSave = async () => {
+    const handleSave = () => {
         if (!examName || round === 0 || totalStudents === 0 || totalQuestions === 0) {
             alert('모든 시험 정보를 입력해주세요.');
             return;
@@ -40,17 +38,6 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave, onBatchGenerate }) 
 
         onSave(info);
         setIsLocked(true);
-
-        // Load JSON and trigger batch generation
-        if (onBatchGenerate) {
-            try {
-                const students = await loadStudentAnalysis();
-                onBatchGenerate(students);
-            } catch (error) {
-                alert('학생 데이터 로드 실패. students_analysis.json 파일을 확인해주세요.');
-                console.error(error);
-            }
-        }
     };
 
     const handleEdit = () => {

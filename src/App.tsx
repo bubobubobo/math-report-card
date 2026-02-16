@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 import ExamInfoForm from './components/ExamInfoForm';
+import PromptDisplay from './components/PromptDisplay';
 import ReportCard from './components/ReportCard';
 import { Download, Trash2 } from 'lucide-react';
 import type { ReportData, ExamInfo, StudentAnalysis } from './types';
@@ -67,7 +68,8 @@ function App() {
 
         {/* Left Column: Input Forms */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
-          <ExamInfoForm onSave={setExamInfo} onBatchGenerate={handleBatchGenerate} />
+          <ExamInfoForm onSave={setExamInfo} />
+          <PromptDisplay />
         </div>
 
         {/* Right Column: Report Previews */}
