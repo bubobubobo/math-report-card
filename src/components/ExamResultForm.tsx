@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileSpreadsheet, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { FileSpreadsheet, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { parseExcelToJson } from '../utils/excelParser';
 import { analyzeExamResults } from '../utils/ai';
 

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 import ExamInfoForm from './components/ExamInfoForm';
-import ExamResultForm from './components/ExamResultForm';
 import ReportCard from './components/ReportCard';
 import { Download, Trash2 } from 'lucide-react';
 import type { ReportData, ExamInfo, StudentAnalysis } from './types';
@@ -11,10 +10,6 @@ function App() {
   const [reports, setReports] = useState<{ data: ReportData, imageUrl: string }[]>([]);
   const [processingReport, setProcessingReport] = useState<ReportData | null>(null);
   const captureRef = useRef<HTMLDivElement>(null);
-
-  const addReportCallback = (data: ReportData) => {
-    setProcessingReport(data);
-  };
 
   const handleBatchGenerate = (students: StudentAnalysis[]) => {
     if (!examInfo) {
@@ -73,8 +68,6 @@ function App() {
         {/* Left Column: Input Forms */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
           <ExamInfoForm onSave={setExamInfo} onBatchGenerate={handleBatchGenerate} />
-          {/* <StudentInfoForm examInfo={examInfo} onSubmit={addReportCallback} /> */}
-          {/* <ExamResultForm /> */}
         </div>
 
         {/* Right Column: Report Previews */}
