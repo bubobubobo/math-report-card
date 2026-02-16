@@ -13,6 +13,7 @@ function App() {
   const [processingReport, setProcessingReport] = useState<ReportData | null>(null);
   const [uploadedStudents, setUploadedStudents] = useState<StudentAnalysis[] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const captureRef = useRef<HTMLDivElement>(null);
 
   const handleJsonUpload = (students: StudentAnalysis[]) => {
@@ -110,45 +111,72 @@ function App() {
           <h2 className="text-2xl font-bold text-slate-800">생성된 성적표 ({reports.length})</h2>
           {reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[600px] bg-white rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
-              <p className="text-lg">성적표 이미지 생성 중...</p>
               <p className="text-sm">좌측에서 정보를 입력하고 성적표를 생성해보세요.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {/* Changed to grid-cols-2/3 for smaller images (thumbnails) */}
+            <div className="space-y-4">
               {reports.map((report, index) => (
-                <div key={index} className="bg-white rounded shadow-lg overflow-hidden border border-slate-200 hover:shadow-xl transition">
-                  <img
-                    src={report.imageUrl}
-                    alt={`${report.data.studentName} 성적표`}
-                    className="w-full h-auto object-contain cursor-pointer"
-                    onClick={() => {
-                      const win = window.open();
-                      if (win) {
-                        win.document.write(`<img src="${report.imageUrl}" style="width:100%"/>`);
-                      }
-                    }}
-                  />
-                  <div className="p-3 bg-slate-50 border-t flex justify-between items-center">
-                    <span className="font-bold text-slate-700 truncate text-sm">{report.data.studentName}</span>
-                    <div className="flex gap-2">
+                <div key={index} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                  <div
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors ${expandedIndex === index ? 'bg-slate-50' : ''}`}
+                    onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-lg text-slate-800">{report.data.studentName} 학생</span>
+                      {report.data.studentAnalysis && (
+                        <span className="text-sm text-slate-500">
+                          {report.data.studentAnalysis.studentInfo.학교} {report.data.studentAnalysis.studentInfo.반}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {report.data.studentAnalysis && (
+                        <span className="text-sm font-semibold text-blue-600">
+                          {report.data.studentAnalysis.studentInfo.점수}점
+                        </span>
+                      )}
                       <a
                         href={report.imageUrl}
                         download={`${report.data.studentName}_성적표.png`}
+                        onClick={(e) => e.stopPropagation()}
                         className="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition"
                         title="다운로드"
                       >
                         <Download size={16} />
                       </a>
-                      <button
-                        onClick={() => deleteReport(index)}
-                        className="p-1.5 text-red-500 hover:bg-red-100 rounded transition"
-                        title="삭제"
+                      <svg
+                        className={`w-5 h-5 text-slate-400 transition-transform ${expandedIndex === index ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        <Trash2 size={16} />
-                      </button>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </div>
                   </div>
+
+                  {expandedIndex === index && (
+                    <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+                      <div className="flex justify-end mb-4">
+                        <a
+                          href={report.imageUrl}
+                          download={`${report.data.studentName}_성적표.png`}
+                          className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition-colors shadow-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Download size={16} />
+                          이미지 다운로드
+                        </a>
+                      </div>
+                      <div className="flex justify-center">
+                        <img
+                          src={report.imageUrl}
+                          alt={`${report.data.studentName} 성적표`}
+                          className="max-w-full shadow-lg rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
