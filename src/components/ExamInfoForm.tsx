@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import type { ExamInfo, ScoreInfo } from '../types';
+import type { ExamInfo, StudentAnalysis } from '../types';
 import { Check, Edit2 } from 'lucide-react';
+import { loadStudentAnalysis } from '../utils/jsonLoader';
 
 interface ExamInfoFormProps {
     onSave: (info: ExamInfo) => void;
+    onBatchGenerate?: (students: StudentAnalysis[]) => void;
 }
 
-const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
+const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave, onBatchGenerate }) => {
     const [isLocked, setIsLocked] = useState(false);
 
     const [examName, setExamName] = useState('');
@@ -15,31 +17,12 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
     const [totalStudents, setTotalStudents] = useState<number>(0);
     const [totalQuestions, setTotalQuestions] = useState<number>(0);
-    const [scoreDistribution, setScoreDistribution] = useState<ScoreInfo[]>([]);
 
     const handleTotalQuestionsChange = (val: number) => {
         setTotalQuestions(val);
-        if (val <= 0) {
-            setScoreDistribution([]);
-            return;
-        }
-
-        // Preserve existing scores if possible, otherwise init with 0
-        const newDist: ScoreInfo[] = [];
-        for (let i = 1; i <= val; i++) {
-            const existing = scoreDistribution.find(s => s.questionNumber === i);
-            newDist.push(existing || { questionNumber: i, score: 0 });
-        }
-        setScoreDistribution(newDist);
     };
 
-    const updateScoreInfo = (qNum: number, scoreVal: number) => {
-        setScoreDistribution(scoreDistribution.map(s =>
-            s.questionNumber === qNum ? { ...s, score: scoreVal } : s
-        ));
-    };
-
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!examName || round === 0 || totalStudents === 0 || totalQuestions === 0) {
             alert('모든 시험 정보를 입력해주세요.');
             return;
@@ -52,11 +35,22 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
             round: Number(round),
             totalStudents: Number(totalStudents),
             totalQuestions: Number(totalQuestions),
-            scoreDistribution
+            scoreDistribution: []
         };
 
         onSave(info);
         setIsLocked(true);
+
+        // Load JSON and trigger batch generation
+        if (onBatchGenerate) {
+            try {
+                const students = await loadStudentAnalysis();
+                onBatchGenerate(students);
+            } catch (error) {
+                alert('학생 데이터 로드 실패. students_analysis.json 파일을 확인해주세요.');
+                console.error(error);
+            }
+        }
     };
 
     const handleEdit = () => {
@@ -153,24 +147,7 @@ const ExamInfoForm: React.FC<ExamInfoFormProps> = ({ onSave }) => {
                     </div>
                 </div>
 
-                {scoreDistribution.length > 0 && (
-                    <div className="mt-4">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">문항별 배점</label>
-                        <div className="grid grid-cols-5 gap-2">
-                            {scoreDistribution.map((s) => (
-                                <div key={s.questionNumber} className="flex flex-col items-center">
-                                    <span className="text-[10px] text-slate-500">{s.questionNumber}</span>
-                                    <input
-                                        type="number"
-                                        value={s.score === 0 ? '' : s.score}
-                                        onChange={(e) => updateScoreInfo(s.questionNumber, Number(e.target.value))}
-                                        className="w-full text-center text-xs p-1 border border-slate-200 rounded focus:outline-none focus:border-blue-500"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
 
                 <button
                     onClick={handleSave}

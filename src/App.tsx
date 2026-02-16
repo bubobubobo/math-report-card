@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import * as htmlToImage from 'html-to-image';
 import ExamInfoForm from './components/ExamInfoForm';
-import StudentInfoForm from './components/StudentInfoForm';
+import ExamResultForm from './components/ExamResultForm';
 import ReportCard from './components/ReportCard';
 import { Download, Trash2 } from 'lucide-react';
-import type { ReportData, ExamInfo } from './types';
+import type { ReportData, ExamInfo, StudentAnalysis } from './types';
 
 function App() {
   const [examInfo, setExamInfo] = useState<ExamInfo | null>(null);
@@ -14,6 +14,25 @@ function App() {
 
   const addReportCallback = (data: ReportData) => {
     setProcessingReport(data);
+  };
+
+  const handleBatchGenerate = (students: StudentAnalysis[]) => {
+    if (!examInfo) {
+      alert('시험 정보가 설정되지 않았습니다.');
+      return;
+    }
+
+    // Process students one by one with delay
+    students.forEach((student, index) => {
+      setTimeout(() => {
+        const reportData: ReportData = {
+          studentName: student.studentInfo.이름,
+          examInfo: examInfo,
+          studentAnalysis: student
+        };
+        setProcessingReport(reportData);
+      }, index * 1000); // 1 second delay between each
+    });
   };
 
   const deleteReport = (index: number) => {
@@ -53,8 +72,9 @@ function App() {
 
         {/* Left Column: Input Forms */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
-          <ExamInfoForm onSave={setExamInfo} />
-          <StudentInfoForm examInfo={examInfo} onSubmit={addReportCallback} />
+          <ExamInfoForm onSave={setExamInfo} onBatchGenerate={handleBatchGenerate} />
+          {/* <StudentInfoForm examInfo={examInfo} onSubmit={addReportCallback} /> */}
+          {/* <ExamResultForm /> */}
         </div>
 
         {/* Right Column: Report Previews */}
@@ -113,7 +133,7 @@ function App() {
         <div style={{ position: 'fixed', top: 0, left: 0, zIndex: -50, opacity: 0, pointerEvents: 'none' }}>
           <div ref={captureRef} className="w-[800px] min-h-[1000px] bg-white p-8 box-border">
             {/* Fixed width and min-height for consistent capture size */}
-            <ReportCard data={processingReport} onReset={() => { }} />
+            <ReportCard data={processingReport} />
           </div>
         </div>
       )}

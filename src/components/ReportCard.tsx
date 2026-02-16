@@ -1,100 +1,108 @@
 import React from 'react';
 import type { ReportData } from '../types';
-import { MATH_METADATA } from '../data/metadata';
 
 interface ReportCardProps {
     data: ReportData;
 }
 
 const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
-    const getMajorName = (subject: string, id: number) => {
-        return MATH_METADATA.subjects[subject]?.majorChapters[id]?.name || '-';
-    };
+    const analysis = data.studentAnalysis;
 
-    const getMinorName = (subject: string, majorId: number, minorId: number) => {
-        return MATH_METADATA.subjects[subject]?.majorChapters[majorId]?.minorChapters[minorId]?.name || '-';
-    };
-
-    const getTypeName = (subject: string, majorId: number, minorId: number, typeId: number) => {
-        return MATH_METADATA.subjects[subject]?.majorChapters[majorId]?.minorChapters[minorId]?.questionTypes[typeId] || '-';
-    };
-
-    return (
-        <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-8 print:shadow-none print:w-full">
-            {/* Header */}
-            <header className="border-b-2 border-slate-800 pb-4 mb-8 flex justify-between items-end">
-                <div>
+    if (!analysis) {
+        // Fallback for old format (if any)
+        return (
+            <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-8 print:shadow-none print:w-full">
+                <header className="border-b-2 border-slate-800 pb-4 mb-8">
                     <h1 className="text-3xl font-extrabold text-slate-900 mb-2">{data.examInfo.examName} 결과 리포트</h1>
                     <p className="text-slate-500 text-sm">
                         {data.examInfo.round}회차 | {data.examInfo.startDate} ~ {data.examInfo.endDate}
                     </p>
-                </div>
-                <div className="text-right">
-                    <p className="text-lg font-bold text-slate-800">{data.studentName} 학생</p>
-                    <p className="text-indigo-600 font-bold text-2xl">{data.score}점</p>
-                </div>
+                    <p className="text-lg font-bold text-slate-800 mt-2">{data.studentName} 학생</p>
+                </header>
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-8 print:shadow-none print:w-full">
+            {/* Header */}
+            <header className="border-b-2 border-slate-800 pb-4 mb-6">
+                <h1 className="text-3xl font-extrabold text-slate-900 mb-2">{data.examInfo.examName} 결과 리포트</h1>
+                <p className="text-slate-500 text-sm">
+                    {data.examInfo.round}회차 | {data.examInfo.startDate} ~ {data.examInfo.endDate}
+                </p>
             </header>
 
-            {/* Wrong Questions Analysis */}
-            <section className="mb-8">
-                <h2 className="text-xl font-bold text-slate-800 mb-4 border-l-4 border-indigo-500 pl-3">
-                    오답 문항 분석
-                </h2>
-
-                {data.wrongQuestions.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left text-slate-600 border-collapse">
-                            <thead className="text-xs text-slate-700 uppercase bg-slate-100 border-b-2 border-slate-300">
-                                <tr>
-                                    <th className="px-4 py-3 border-r">번호</th>
-                                    <th className="px-4 py-3 border-r">과목</th>
-                                    <th className="px-4 py-3 border-r">대단원</th>
-                                    <th className="px-4 py-3 border-r">중단원</th>
-                                    <th className="px-4 py-3 border-r">유형</th>
-                                    <th className="px-4 py-3 text-center">정답률</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200 border-b border-slate-200">
-                                {data.wrongQuestions.map((q) => (
-                                    <tr key={q.id} className="hover:bg-slate-50">
-                                        <td className="px-4 py-3 font-medium text-slate-900 border-r text-center">{q.questionNumber}</td>
-                                        <td className="px-4 py-3 border-r">{q.subject}</td>
-                                        <td className="px-4 py-3 border-r">{getMajorName(q.subject, q.majorChapter)}</td>
-                                        <td className="px-4 py-3 border-r">{getMinorName(q.subject, q.majorChapter, q.minorChapter)}</td>
-                                        <td className="px-4 py-3 border-r font-semibold text-slate-700">{getTypeName(q.subject, q.majorChapter, q.minorChapter, q.questionType)}</td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${q.correctRate < 30 ? 'bg-red-100 text-red-700' :
-                                                q.correctRate < 60 ? 'bg-yellow-100 text-yellow-700' :
-                                                    'bg-blue-100 text-blue-700'
-                                                }`}>
-                                                {q.correctRate}%
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <div className="p-6 bg-green-50 text-green-700 rounded-lg text-center">
-                        틀린 문항이 없습니다. 훌륭합니다!
-                    </div>
-                )}
+            {/* Student Info */}
+            <section className="mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">학생 정보</h2>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div><span className="font-semibold text-slate-600">이름:</span> <span className="text-slate-900">{analysis.studentInfo.이름}</span></div>
+                    <div><span className="font-semibold text-slate-600">학교:</span> <span className="text-slate-900">{analysis.studentInfo.학교}</span></div>
+                    <div><span className="font-semibold text-slate-600">반:</span> <span className="text-slate-900">{analysis.studentInfo.반}</span></div>
+                    <div><span className="font-semibold text-slate-600">점수:</span> <span className="text-slate-900 font-bold">{analysis.studentInfo.점수}점</span></div>
+                    <div><span className="font-semibold text-slate-600">등수:</span> <span className="text-slate-900">{analysis.studentInfo.등수}등</span></div>
+                    <div><span className="font-semibold text-slate-600">맞춘 개수:</span> <span className="text-slate-900">{analysis.studentInfo.맞춘개수}</span></div>
+                </div>
             </section>
 
-            {/* Comments / Evaluation */}
-            <section className="space-y-6">
-                {data.comments.map((comment) => (
-                    <div key={comment.id} className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                        <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-indigo-500 rounded-full"></span>
-                            {comment.sectionTitle}
-                        </h3>
-                        <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">
-                            {comment.content || "입력된 내용이 없습니다."}
-                        </p>
-                    </div>
-                ))}
+            {/* Wrong Questions Table */}
+            <section className="mb-6">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">틀린 문항 분석</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm border-collapse border border-slate-300">
+                        <thead className="bg-slate-100">
+                            <tr>
+                                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">문항번호</th>
+                                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">단원</th>
+                                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">출처</th>
+                                <th className="border border-slate-300 px-3 py-2 text-left font-semibold">정답률</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {analysis.wrongQuestions.map((q, idx) => (
+                                <tr key={idx} className="hover:bg-slate-50">
+                                    <td className="border border-slate-300 px-3 py-2">{q.문항번호}</td>
+                                    <td className="border border-slate-300 px-3 py-2">{q.단원}</td>
+                                    <td className="border border-slate-300 px-3 py-2">{q.출처}</td>
+                                    <td className="border border-slate-300 px-3 py-2">{q.정답률}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            {/* Overall Evaluation */}
+            <section className="mb-6">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">종합 평가</h2>
+                <p className="text-sm text-slate-700 leading-relaxed bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    {analysis.overall}
+                </p>
+            </section>
+
+            {/* Strength */}
+            <section className="mb-6">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">강점</h2>
+                <p className="text-sm text-slate-700 leading-relaxed bg-green-50 p-4 rounded-lg border border-green-200">
+                    {analysis.strength}
+                </p>
+            </section>
+
+            {/* Weakness */}
+            <section className="mb-6">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">약점 및 개선 방향</h2>
+                <div className="space-y-3">
+                    {analysis.weakness.map((item, idx) => {
+                        const [unit, description] = Object.entries(item)[0];
+                        return (
+                            <div key={idx} className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <h3 className="font-bold text-slate-800 mb-2">{unit}</h3>
+                                <p className="text-sm text-slate-700 leading-relaxed">{description}</p>
+                            </div>
+                        );
+                    })}
+                </div>
             </section>
         </div>
     );

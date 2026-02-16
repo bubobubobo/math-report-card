@@ -1,25 +1,4 @@
-export interface WrongQuestion {
-    id: string; // Unique ID for list rendering
-    questionNumber: number;
-    subject: string;
-    majorChapter: number;
-    minorChapter: number;
-    questionType: number;
-    correctRate: number;
-}
-
-export interface Comment {
-    id: string;
-    sectionTitle: string;
-    content: string;
-}
-
 // Exam Information Types
-export interface ScoreInfo {
-    questionNumber: number;
-    score: number;
-}
-
 export interface ExamInfo {
     examName: string;
     startDate: string;
@@ -27,43 +6,37 @@ export interface ExamInfo {
     totalStudents: number;
     round: number;
     totalQuestions: number;
-    scoreDistribution: ScoreInfo[];
+    scoreDistribution: any[]; // Keeping generic or removing if unused
 }
 
+// Student Analysis Types (from JSON)
+export interface WrongQuestion {
+    문항번호: string;
+    단원: string;
+    출처: string;
+    정답률: string;
+}
+
+export interface StudentInfo {
+    이름: string;
+    학교: string;
+    반: string;
+    점수: number;
+    등수: number;
+    맞춘개수: string;
+}
+
+export interface StudentAnalysis {
+    studentInfo: StudentInfo;
+    wrongQuestions: WrongQuestion[];
+    overall: string;
+    strength: string;
+    weakness: Array<{ [key: string]: string }>;
+}
+
+// Report Data
 export interface ReportData {
     studentName: string;
-    examDate: string;
-    score: number;
-    wrongQuestions: WrongQuestion[];
-    comments: Comment[];
     examInfo: ExamInfo;
-}
-
-// Metadata Types
-export interface QuestionTypeMap {
-    [typeNum: number]: string;
-}
-
-export interface MinorChapter {
-    name: string;
-    questionTypes: QuestionTypeMap;
-}
-
-export interface MajorChapter {
-    name: string;
-    minorChapters: {
-        [minorNum: number]: MinorChapter;
-    };
-}
-
-export interface Subject {
-    majorChapters: {
-        [majorNum: number]: MajorChapter;
-    };
-}
-
-export interface MathMetadata {
-    subjects: {
-        [subjectName: string]: Subject;
-    };
+    studentAnalysis?: StudentAnalysis; // Optional for backward compatibility
 }
