@@ -6,7 +6,7 @@ import ExamInfoForm from './components/ExamInfoForm';
 import PromptDisplay from './components/PromptDisplay';
 import JsonUpload from './components/JsonUpload';
 import ReportCard from './components/ReportCard';
-import { Download, FolderDown } from 'lucide-react';
+import { Download, FolderDown, Trash2 } from 'lucide-react';
 import type { ReportData, ExamInfo, StudentAnalysis } from './types';
 
 function App() {
@@ -52,6 +52,14 @@ function App() {
         }
       }, index * 1000); // 1 second delay between each
     });
+  };
+
+  const handleClearAll = () => {
+    if (reports.length === 0) return;
+    if (confirm('모든 성적표를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      setReports([]);
+      setExpandedIndex(null);
+    }
   };
 
   const handleDownloadAll = async () => {
@@ -129,17 +137,28 @@ function App() {
         <div className="col-span-12 lg:col-span-8 space-y-8">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800">생성된 성적표 ({reports.length})</h2>
-            <button
-              onClick={handleDownloadAll}
-              disabled={reports.length === 0 || isGenerating}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md transition shadow-sm font-medium ${reports.length === 0 || isGenerating
-                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-            >
-              <FolderDown size={20} />
-              {isGenerating ? '생성 완료 대기중...' : '전체 다운로드 (ZIP)'}
-            </button>
+            <div className="flex gap-2">
+              {reports.length > 0 && !isGenerating && (
+                <button
+                  onClick={handleClearAll}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition shadow-sm font-medium"
+                >
+                  <Trash2 size={20} />
+                  초기화
+                </button>
+              )}
+              <button
+                onClick={handleDownloadAll}
+                disabled={reports.length === 0 || isGenerating}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md transition shadow-sm font-medium ${reports.length === 0 || isGenerating
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+              >
+                <FolderDown size={20} />
+                {isGenerating ? '생성 완료 대기중...' : '전체 다운로드 (ZIP)'}
+              </button>
+            </div>
           </div>
           {reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[600px] bg-white rounded-lg border-2 border-dashed border-slate-300 text-slate-400">
