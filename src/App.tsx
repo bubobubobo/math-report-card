@@ -74,7 +74,16 @@ function App() {
     reports.forEach((report) => {
       // Remove data:image/png;base64, prefix
       const base64Data = report.imageUrl.split(',')[1];
-      folder.file(`${report.data.studentName}_성적표.png`, base64Data, { base64: true });
+
+      // Get class name (반)
+      const className = report.data.studentAnalysis?.studentInfo.반 || '기타';
+
+      // Create folder for the class
+      const classFolder = folder.folder(className);
+
+      if (classFolder) {
+        classFolder.file(`${report.data.studentName}_성적표.png`, base64Data, { base64: true });
+      }
     });
 
     try {
@@ -151,8 +160,8 @@ function App() {
                 onClick={handleDownloadAll}
                 disabled={reports.length === 0 || isGenerating}
                 className={`flex items-center gap-2 px-4 py-2 rounded-md transition shadow-sm font-medium ${reports.length === 0 || isGenerating
-                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-green-600 text-white hover:bg-green-700'
                   }`}
               >
                 <FolderDown size={20} />
