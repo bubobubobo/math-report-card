@@ -61,7 +61,9 @@ const ReportCard: React.FC<ReportCardProps> = ({ data }) => {
                 ) : (
                     <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                         <div><span className="font-semibold text-slate-600">점수:</span> <span className="text-slate-900 font-bold">{analysis.studentInfo.점수}점</span></div>
-                        <div><span className="font-semibold text-slate-600">등수:</span> <span className="text-slate-900">{analysis.studentInfo.등수}등</span></div>
+                        {analysis.studentInfo.등수 <= 20 && (
+                            <div><span className="font-semibold text-slate-600">등수:</span> <span className="text-slate-900">{analysis.studentInfo.등수}등</span></div>
+                        )}
                     </div>
                 )}
             </section>
